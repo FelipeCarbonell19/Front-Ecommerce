@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import Header from "../../components/layout/Header";
 import Swal from "sweetalert2";
 
 const CheckoutPage = () => {
   const { user } = useAuth();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const {
     cartItems,
     getCartSummary,
@@ -21,7 +21,7 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [orderCreated, setOrderCreated] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false); 
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Estados del formulario
   const [shippingData, setShippingData] = useState({
@@ -203,42 +203,48 @@ const CheckoutPage = () => {
   };
 
   // Simular procesamiento de pago
-    const processPayment = async () => {
-        try {
-            const confirmResult = await Swal.fire({
-                title: '💳 Confirmar Pago',
-                html: `
+  const processPayment = async () => {
+    try {
+      const confirmResult = await Swal.fire({
+        title: "💳 Confirmar Pago",
+        html: `
           <div class="text-left space-y-3">
             <div class="bg-blue-50 p-4 rounded-lg">
-              <p class="text-lg font-bold text-blue-900">💰 Total: ${formatPrice(summary.total)}</p>
+              <p class="text-lg font-bold text-blue-900">💰 Total: ${formatPrice(
+                summary.total
+              )}</p>
             </div>
-            <p><strong>💳 Tarjeta:</strong> ${paymentData.cardType} ****${paymentData.cardNumber.slice(-4)}</p>
+            <p><strong>💳 Tarjeta:</strong> ${
+              paymentData.cardType
+            } ****${paymentData.cardNumber.slice(-4)}</p>
             <p><strong>📦 Envío a:</strong> ${shippingData.fullName}</p>
-            <p><strong>📍 Dirección:</strong> ${shippingData.address}, ${shippingData.city}</p>
+            <p><strong>📍 Dirección:</strong> ${shippingData.address}, ${
+          shippingData.city
+        }</p>
             <hr class="my-3">
             <p class="text-sm text-gray-600">¿Confirmas que deseas proceder con el pago?</p>
           </div>
         `,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#1e40af',
-                cancelButtonColor: '#dc2626',
-                confirmButtonText: '💳 Sí, Pagar Ahora',
-                cancelButtonText: '❌ Cancelar',
-                customClass: {
-                    popup: 'rounded-lg',
-                    htmlContainer: 'text-sm'
-                }
-            });
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#1e40af",
+        cancelButtonColor: "#dc2626",
+        confirmButtonText: "💳 Sí, Pagar Ahora",
+        cancelButtonText: "❌ Cancelar",
+        customClass: {
+          popup: "rounded-lg",
+          htmlContainer: "text-sm",
+        },
+      });
 
-            if (!confirmResult.isConfirmed) {
-                return; 
-            }
+      if (!confirmResult.isConfirmed) {
+        return;
+      }
 
-            // PASO 2: Mostrar loading
-            Swal.fire({
-                title: '⏳ Procesando Pago...',
-                html: `
+      // PASO 2: Mostrar loading
+      Swal.fire({
+        title: "⏳ Procesando Pago...",
+        html: `
           <div class="text-center">
             <div class="animate-spin inline-block w-12 h-12 border-4 border-current border-t-transparent text-blue-600 rounded-full mb-4"></div>
             <p class="text-lg mb-2">Conectando con el banco...</p>
@@ -249,45 +255,45 @@ const CheckoutPage = () => {
             </div>
           </div>
         `,
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                showConfirmButton: false
-            });
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+      });
 
-            // PASO 3: Simular procesamiento
-            await new Promise((resolve) => setTimeout(resolve, 3000));
+      // PASO 3: Simular procesamiento
+      await new Promise((resolve) => setTimeout(resolve, 3000));
 
-            const cleanNumber = paymentData.cardNumber.replace(/\s/g, "");
-            const cardInfo = testCards[cleanNumber];
+      const cleanNumber = paymentData.cardNumber.replace(/\s/g, "");
+      const cardInfo = testCards[cleanNumber];
 
-            let result;
-            if (cardInfo) {
-                result = {
-                    success: cardInfo.result === "approved",
-                    message:
-                        cardInfo.result === "approved"
-                            ? `Pago aprobado con tarjeta ${cardInfo.type}`
-                            : `Pago rechazado - Fondos insuficientes`,
-                    transactionId: `TXN-${Date.now()}`,
-                    cardType: cardInfo.type,
-                };
-            } else {
-                result = {
-                    success: false,
-                    message: "Tarjeta no válida para demo",
-                    transactionId: null,
-                    cardType: paymentData.cardType,
-                };
-            }
+      let result;
+      if (cardInfo) {
+        result = {
+          success: cardInfo.result === "approved",
+          message:
+            cardInfo.result === "approved"
+              ? `Pago aprobado con tarjeta ${cardInfo.type}`
+              : `Pago rechazado - Fondos insuficientes`,
+          transactionId: `TXN-${Date.now()}`,
+          cardType: cardInfo.type,
+        };
+      } else {
+        result = {
+          success: false,
+          message: "Tarjeta no válida para demo",
+          transactionId: null,
+          cardType: paymentData.cardType,
+        };
+      }
 
-            setPaymentResult(result);
+      setPaymentResult(result);
 
-            // PASO 4: Mostrar resultado
-            if (result.success) {
-                // ✅ PAGO EXITOSO
-                await Swal.fire({
-                    title: '✅ Pago Aprobado',
-                    html: `
+      // PASO 4: Mostrar resultado
+      if (result.success) {
+        // ✅ PAGO EXITOSO
+        await Swal.fire({
+          title: "✅ Pago Aprobado",
+          html: `
             <div class="text-center">
               <div class="text-green-500 mb-4">
                 <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
@@ -299,19 +305,19 @@ const CheckoutPage = () => {
               <p class="text-sm text-gray-600 mt-3">Ahora crearemos tu pedido...</p>
             </div>
           `,
-                    icon: 'success',
-                    confirmButtonColor: '#10b981',
-                    confirmButtonText: '📦 Crear Pedido',
-                    timer: 3000,
-                    timerProgressBar: true
-                });
+          icon: "success",
+          confirmButtonColor: "#10b981",
+          confirmButtonText: "📦 Crear Pedido",
+          timer: 3000,
+          timerProgressBar: true,
+        });
 
-                setCurrentStep(3);
-            } else {
-                // ❌ PAGO RECHAZADO
-                await Swal.fire({
-                    title: '❌ Pago Rechazado',
-                    html: `
+        setCurrentStep(3);
+      } else {
+        // ❌ PAGO RECHAZADO
+        await Swal.fire({
+          title: "❌ Pago Rechazado",
+          html: `
             <div class="text-center">
               <div class="text-red-500 mb-4">
                 <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
@@ -329,72 +335,76 @@ const CheckoutPage = () => {
               </div>
             </div>
           `,
-                    icon: 'error',
-                    confirmButtonColor: '#dc2626',
-                    confirmButtonText: '🔄 Intentar de Nuevo'
-                });
+          icon: "error",
+          confirmButtonColor: "#dc2626",
+          confirmButtonText: "🔄 Intentar de Nuevo",
+        });
 
-                setCurrentStep(3);
-            }
+        setCurrentStep(3);
+      }
+    } catch (error) {
+      console.error("Error procesando pago:", error);
 
-        } catch (error) {
-            console.error('Error procesando pago:', error);
-
-            await Swal.fire({
-                title: '❌ Error Inesperado',
-                text: 'Ocurrió un error procesando el pago. Por favor intenta nuevamente.',
-                icon: 'error',
-                confirmButtonColor: '#dc2626',
-                confirmButtonText: 'Entendido'
-            });
-        }
-    };
+      await Swal.fire({
+        title: "❌ Error Inesperado",
+        text: "Ocurrió un error procesando el pago. Por favor intenta nuevamente.",
+        icon: "error",
+        confirmButtonColor: "#dc2626",
+        confirmButtonText: "Entendido",
+      });
+    }
+  };
 
   // Crear pedido en backend
-    const createOrder = async () => {
-        setLoading(true);
+  const createOrder = async () => {
+    setLoading(true);
 
-        try {
-            const orderData = {
-                items: cartItems.map(item => ({
-                    product_id: item.id,
-                    quantity: item.quantity
-                })),
-                shipping_data: {  // 🔥 CORRECTO: shipping_data como espera el backend
-                    fullName: shippingData.fullName,
-                    email: shippingData.email,
-                    phone: shippingData.phone,
-                    address: shippingData.address,
-                    city: shippingData.city,
-                    zipCode: shippingData.zipCode,
-                    notes: shippingData.notes
-                },
-                payment_data: {   // 🔥 CORRECTO: payment_data como espera el backend
-                    transaction_id: paymentResult.transactionId,
-                    card_type: paymentResult.cardType,
-                    card_number: paymentData.cardNumber.replace(/\s/g, '')
-                }
-            };
+    try {
+      const orderData = {
+        items: cartItems.map((item) => ({
+          product_id: item.id,
+          quantity: item.quantity,
+        })),
+        shipping_data: {
+          // 🔥 CORRECTO: shipping_data como espera el backend
+          fullName: shippingData.fullName,
+          email: shippingData.email,
+          phone: shippingData.phone,
+          address: shippingData.address,
+          city: shippingData.city,
+          zipCode: shippingData.zipCode,
+          notes: shippingData.notes,
+        },
+        payment_data: {
+          // 🔥 CORRECTO: payment_data como espera el backend
+          transaction_id: paymentResult.transactionId,
+          card_type: paymentResult.cardType,
+          card_number: paymentData.cardNumber.replace(/\s/g, ""),
+        },
+      };
 
-            console.log('📤 Enviando pedido:', orderData);
+      console.log("📤 Enviando pedido:", orderData);
 
-            const response = await fetch('http://localhost:5000/api/orders', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify(orderData)
-            });
+      const response = await fetch(
+        '${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/orders',
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(orderData),
+        }
+      );
 
-            const result = await response.json();
-            console.log('📥 Respuesta del servidor:', result);
+      const result = await response.json();
+      console.log("📥 Respuesta del servidor:", result);
 
-            if (result.success) {
-                // 🔥 PEDIDO EXITOSO CON OPCIÓN DE PDF
-                const successResult = await Swal.fire({
-                    title: '🎉 ¡Pedido Creado!',
-                    html: `
+      if (result.success) {
+        // 🔥 PEDIDO EXITOSO CON OPCIÓN DE PDF
+        const successResult = await Swal.fire({
+          title: "🎉 ¡Pedido Creado!",
+          html: `
             <div class="text-center">
               <div class="text-green-500 mb-4">
                 <svg class="w-20 h-20 mx-auto" fill="currentColor" viewBox="0 0 20 20">
@@ -404,129 +414,145 @@ const CheckoutPage = () => {
               <p class="text-xl font-bold text-green-600 mb-3">¡Compra Exitosa!</p>
               <div class="bg-gray-50 p-4 rounded-lg mb-4">
                 <p class="text-lg font-bold">Pedido #${result.order.id}</p>
-                <p class="text-2xl font-bold text-green-600">${formatPrice(result.order.total_amount)}</p>
+                <p class="text-2xl font-bold text-green-600">${formatPrice(
+                  result.order.total_amount
+                )}</p>
               </div>
               <p class="text-sm text-gray-600 mb-2">✅ Recibirás un email con los detalles</p>
               <p class="text-sm text-gray-600">📦 Tu pedido será procesado pronto</p>
-              ${result.receipt_url ? '<p class="text-sm text-blue-600 mt-3">📄 Comprobante PDF disponible</p>' : ''}
+              ${
+                result.receipt_url
+                  ? '<p class="text-sm text-blue-600 mt-3">📄 Comprobante PDF disponible</p>'
+                  : ""
+              }
             </div>
           `,
-                    icon: 'success',
-                    showCancelButton: result.receipt_url ? true : false,
-                    confirmButtonColor: '#10b981',
-                    cancelButtonColor: '#1e40af',
-                    confirmButtonText: '📋 Ver Mis Pedidos',
-                    cancelButtonText: result.receipt_url ? '📄 Descargar Comprobante' : ''
-                });
+          icon: "success",
+          showCancelButton: result.receipt_url ? true : false,
+          confirmButtonColor: "#10b981",
+          cancelButtonColor: "#1e40af",
+          confirmButtonText: "📋 Ver Mis Pedidos",
+          cancelButtonText: result.receipt_url
+            ? "📄 Descargar Comprobante"
+            : "",
+        });
 
-                // Manejar descarga de PDF
-                if (successResult.isDismissed && successResult.dismiss === Swal.DismissReason.cancel) {
-                    await downloadReceipt(result.order.id);
-                }
+        // Manejar descarga de PDF
+        if (
+          successResult.isDismissed &&
+          successResult.dismiss === Swal.DismissReason.cancel
+        ) {
+          await downloadReceipt(result.order.id);
+        }
 
-                clearCart();
-                setOrderCreated(true);
-                setCurrentStep(4);
+        clearCart();
+        setOrderCreated(true);
+        setCurrentStep(4);
 
-                // Redirigir después de un momento
-                setTimeout(() => {
-                    navigate('/my-orders');
-                }, 2000);
+        // Redirigir después de un momento
+        setTimeout(() => {
+          navigate("/my-orders");
+        }, 2000);
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      console.error("❌ Error creando pedido:", error);
 
-            } else {
-                throw new Error(result.message);
-            }
-        } catch (error) {
-            console.error('❌ Error creando pedido:', error);
-
-            await Swal.fire({
-                title: '❌ Error Creando Pedido',
-                html: `
+      await Swal.fire({
+        title: "❌ Error Creando Pedido",
+        html: `
           <p class="text-red-600 mb-4">No se pudo crear el pedido:</p>
           <p class="text-sm text-gray-600 bg-gray-50 p-3 rounded">${error.message}</p>
           <p class="text-sm text-gray-600 mt-4">Por favor intenta nuevamente o contacta soporte.</p>
         `,
-                icon: 'error',
-                confirmButtonColor: '#dc2626',
-                confirmButtonText: 'Intentar Nuevamente'
-            });
-        } finally {
-            setLoading(false);
+        icon: "error",
+        confirmButtonColor: "#dc2626",
+        confirmButtonText: "Intentar Nuevamente",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const downloadReceipt = async (orderId) => {
+    try {
+      Swal.fire({
+        title: "📄 Descargando Comprobante...",
+        text: "Preparando tu PDF",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => Swal.showLoading(),
+      });
+
+      // ⭐ ARREGLO: Usar la URL que viene del backend (receipt_url)
+      // Primero obtener los detalles del pedido para tener la URL correcta
+
+      const orderResponse = await fetch(
+        `${
+          import.meta.env.VITE_API_URL || "http://localhost:5000"
+        }/api/orders/${orderId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
-    };
+      );
 
-const downloadReceipt = async (orderId) => {
-  try {
-    Swal.fire({
-      title: '📄 Descargando Comprobante...',
-      text: 'Preparando tu PDF',
-      allowOutsideClick: false,
-      showConfirmButton: false,
-      willOpen: () => Swal.showLoading()
-    });
+      if (!orderResponse.ok) {
+        throw new Error("No se pudo obtener información del pedido");
+      }
 
-    // ⭐ ARREGLO: Usar la URL que viene del backend (receipt_url)
-    // Primero obtener los detalles del pedido para tener la URL correcta
-    const orderResponse = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+      const orderData = await orderResponse.json();
+      console.log("📊 Datos del pedido:", orderData);
 
-    if (!orderResponse.ok) {
-      throw new Error('No se pudo obtener información del pedido');
-    }
+      if (!orderData.success || !orderData.data.order.receipt_url) {
+        throw new Error("Comprobante no disponible para este pedido");
+      }
 
-    const orderData = await orderResponse.json();
-    console.log('📊 Datos del pedido:', orderData);
+      // ⭐ USAR LA URL EXACTA DEL BACKEND
+      const pdfUrl = orderData.data.order.receipt_url;
+      console.log("📄 URL del PDF:", pdfUrl);
 
-    if (!orderData.success || !orderData.data.order.receipt_url) {
-      throw new Error('Comprobante no disponible para este pedido');
-    }
+      const response = await fetch(pdfUrl, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
-    // ⭐ USAR LA URL EXACTA DEL BACKEND
-    const pdfUrl = orderData.data.order.receipt_url;
-    console.log('📄 URL del PDF:', pdfUrl);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `comprobante_pedido_${orderId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
 
-    const response = await fetch(pdfUrl, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-
-    if (response.ok) {
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `comprobante_pedido_${orderId}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+        Swal.fire({
+          title: "✅ Descarga Exitosa",
+          text: "Tu comprobante PDF se ha descargado correctamente",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } else {
+        throw new Error("Archivo no encontrado");
+      }
+    } catch (error) {
+      console.error("Error descargando PDF:", error);
 
       Swal.fire({
-        title: '✅ Descarga Exitosa',
-        text: 'Tu comprobante PDF se ha descargado correctamente',
-        icon: 'success',
-        timer: 2000,
-        showConfirmButton: false
+        title: "⚠️ Error de Descarga",
+        text: `No se pudo descargar el comprobante: ${error.message}`,
+        icon: "warning",
+        confirmButtonColor: "#f59e0b",
+        confirmButtonText: "Entendido",
       });
-    } else {
-      throw new Error('Archivo no encontrado');
     }
-  } catch (error) {
-    console.error('Error descargando PDF:', error);
-
-    Swal.fire({
-      title: '⚠️ Error de Descarga',
-      text: `No se pudo descargar el comprobante: ${error.message}`,
-      icon: 'warning',
-      confirmButtonColor: '#f59e0b',
-      confirmButtonText: 'Entendido'
-    });
-  }
-};
+  };
   // Siguiente paso
   const nextStep = async () => {
     if (currentStep === 1) {

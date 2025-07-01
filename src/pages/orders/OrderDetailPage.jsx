@@ -56,7 +56,7 @@ const OrderDetailPage = () => {
         willOpen: () => Swal.showLoading(),
       });
 
-      const pdfUrl = `http://localhost:5000${receiptUrl}`;
+      const pdfUrl = `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${receiptUrl}`;
 
       const response = await fetch(pdfUrl, {
         headers: {
