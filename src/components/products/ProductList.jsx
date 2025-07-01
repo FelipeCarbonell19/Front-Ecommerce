@@ -1,13 +1,19 @@
-import { useState, useEffect } from 'react';
-import ProductCard from './ProductCard';
-import { productService } from '../../services/productService';
+import { useState, useEffect } from "react";
+import ProductCard from "./ProductCard";
+import { productService } from "../../services/productService";
 
-const ProductList = ({ showActions = false, onAddToCart, onEdit, onDelete }) => {
+const ProductList = ({
+  showActions = false,
+  onAddToCart,
+  onEdit,
+  onDelete,
+}) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [showForm, setShowForm] = useState(false)
 
   // Cargar productos al montar el componente
   useEffect(() => {
@@ -16,22 +22,29 @@ const ProductList = ({ showActions = false, onAddToCart, onEdit, onDelete }) => 
 
   // Filtrar productos cuando cambia el término de búsqueda
   useEffect(() => {
-    if (searchTerm.trim() === '') {
+    if (searchTerm.trim() === "") {
       setFilteredProducts(products);
     } else {
-      const filtered = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category_name?.toLowerCase().includes(searchTerm.toLowerCase())
+      const filtered = products.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.description
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          product.category_name
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase())
       );
       setFilteredProducts(filtered);
     }
   }, [searchTerm, products]);
 
+
+
   // Función para cargar productos
   const loadProducts = async () => {
     setLoading(true);
-    setError('');
+    setError("");
     try {
       const result = await productService.getProducts();
       if (result.success) {
@@ -43,8 +56,8 @@ const ProductList = ({ showActions = false, onAddToCart, onEdit, onDelete }) => 
         setFilteredProducts([]);
       }
     } catch (error) {
-      console.error('Error loading products:', error);
-      setError('Error de conexión al cargar productos');
+      console.error("Error loading products:", error);
+      setError("Error de conexión al cargar productos");
       setProducts([]);
       setFilteredProducts([]);
     } finally {
@@ -88,7 +101,9 @@ const ProductList = ({ showActions = false, onAddToCart, onEdit, onDelete }) => 
           <div className="flex items-center justify-center mb-4">
             <span className="text-red-500 text-2xl">⚠️</span>
           </div>
-          <h3 className="text-lg font-medium text-red-800 mb-2">Error al cargar productos</h3>
+          <h3 className="text-lg font-medium text-red-800 mb-2">
+            Error al cargar productos
+          </h3>
           <p className="text-red-600 text-sm mb-4">{error}</p>
           <button
             onClick={handleRefresh}
@@ -107,10 +122,16 @@ const ProductList = ({ showActions = false, onAddToCart, onEdit, onDelete }) => 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         {/* Información de productos */}
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Productos Disponibles</h2>
+          <h2 className="text-3xl font-bold text-gray-900">
+            Productos Disponibles
+          </h2>
           <p className="text-gray-600">
-            {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''}
-            {searchTerm && ` encontrado${filteredProducts.length !== 1 ? 's' : ''} para "${searchTerm}"`}
+            {filteredProducts.length} producto
+            {filteredProducts.length !== 1 ? "s" : ""}
+            {searchTerm &&
+              ` encontrado${
+                filteredProducts.length !== 1 ? "s" : ""
+              } para "${searchTerm}"`}
           </p>
         </div>
 
@@ -123,16 +144,6 @@ const ProductList = ({ showActions = false, onAddToCart, onEdit, onDelete }) => 
           >
             🔄 Actualizar
           </button>
-
-          {/* Botón crear producto (si showActions) */}
-          {showActions && (
-            <button
-              onClick={() => window.location.href = '/admin/products/create'}
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md"
-            >
-              ➕ Crear Producto
-            </button>
-          )}
         </div>
       </div>
 
@@ -150,7 +161,7 @@ const ProductList = ({ showActions = false, onAddToCart, onEdit, onDelete }) => 
         </div>
         {searchTerm && (
           <button
-            onClick={() => setSearchTerm('')}
+            onClick={() => setSearchTerm("")}
             className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
           >
             ✕
@@ -164,14 +175,18 @@ const ProductList = ({ showActions = false, onAddToCart, onEdit, onDelete }) => 
           <div className="max-w-md mx-auto">
             <span className="text-6xl mb-4 block">📦</span>
             <h3 className="text-xl font-medium text-gray-900 mb-2">
-              {searchTerm ? 'No se encontraron productos' : 'No hay productos disponibles'}
+              {searchTerm
+                ? "No se encontraron productos"
+                : "No hay productos disponibles"}
             </h3>
             <p className="text-gray-600">
-              {searchTerm ? 'Intenta con otros términos de búsqueda' : 'Aún no hay productos en el catálogo'}
+              {searchTerm
+                ? "Intenta con otros términos de búsqueda"
+                : "Aún no hay productos en el catálogo"}
             </p>
             {searchTerm && (
               <button
-                onClick={() => setSearchTerm('')}
+                onClick={() => setSearchTerm("")}
                 className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors shadow-md"
               >
                 Ver todos los productos

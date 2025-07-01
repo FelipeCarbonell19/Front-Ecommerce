@@ -119,8 +119,7 @@ const ProductForm = ({ product, onSave, onCancel }) => {
     }
   };
 
-  // Manejar envío del formulario - ACTUALIZADO
-
+  // Manejar envío del formulario - CORREGIDO
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -169,13 +168,18 @@ const ProductForm = ({ product, onSave, onCancel }) => {
             timer: 2000,
             showConfirmButton: false,
           });
-          onSave(result.product);
+
+          if (typeof onCancel === "function") {
+            onCancel(); 
+          }
+          return; 
         } else {
           Swal.fire({
             icon: "error",
             title: "Error",
             text: result.message,
           });
+          return; 
         }
       } else {
         const dataToSend = {
@@ -213,9 +217,6 @@ const ProductForm = ({ product, onSave, onCancel }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Todos los campos existentes SIN CAMBIOS */}
-
-      {/* Nombre del producto */}
       <div>
         <label
           htmlFor="name"
@@ -371,7 +372,6 @@ const ProductForm = ({ product, onSave, onCancel }) => {
 
         {/* Mostrar campo según selección */}
         {!useFileUpload ? (
-          // Campo URL (original)
           <div>
             <input
               type="url"
