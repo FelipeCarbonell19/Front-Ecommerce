@@ -386,7 +386,7 @@ const CheckoutPage = () => {
       console.log("📤 Enviando pedido:", orderData);
 
       const response = await fetch(
-        '${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/orders',
+        `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/orders`,
         {
           method: "POST",
           headers: {
